@@ -1,3 +1,4 @@
 ---
 title: "Posts"
+groupByYear: false
 ---

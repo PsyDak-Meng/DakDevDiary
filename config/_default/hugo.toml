@@ -19,7 +19,7 @@ enableEmoji = true
 # googleAnalytics = "G-XXXXXXXXX"
 
 [pagination]
-  pagerSize = 100
+  pagerSize = 25
 
 [imaging]
   anchor = 'Center'

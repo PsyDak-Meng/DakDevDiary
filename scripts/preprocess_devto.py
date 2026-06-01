@@ -100,6 +100,10 @@ def process_file(src: Path) -> None:
     if existing_id is not None:
         fm["id"] = existing_id
 
+    # Sanitize tags: Dev.to requires lowercase, no spaces, max 4
+    if "tags" in fm:
+        fm["tags"] = [re.sub(r"\s+", "", t).lower() for t in fm["tags"][:4]]
+
     # Inject published: true here so Hugo never sees it in source files
     fm["published"] = True
 
