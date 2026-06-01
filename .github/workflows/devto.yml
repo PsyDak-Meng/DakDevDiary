@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'content/posts/**/*.md'
+      - 'scripts/preprocess_devto.py'
 
 permissions:
   contents: write
