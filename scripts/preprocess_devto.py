@@ -51,7 +51,9 @@ def render_frontmatter(fm: dict) -> str:
 
 
 def latex_to_img(latex: str, display: bool = False) -> str:
-    encoded = quote(latex.strip())
+    # \bg{white} forces opaque white background — transparent PNG is invisible in dark mode
+    formula = r'\bg{white} ' + latex.strip()
+    encoded = quote(formula)
     alt = "equation" if display else latex.strip()[:40]
     return f"![{alt}]({CODECOGS_BASE}{encoded})"
 
@@ -105,12 +107,12 @@ def add_hard_breaks(body: str) -> str:
             is_inline = (
                 stripped
                 and not _BLOCK_RE.match(line)
-                and not line.rstrip().endswith('  ')
+                and not line.rstrip().endswith('\\')
             )
             next_is_inline = next_stripped and not _BLOCK_RE.match(next_line)
 
             if is_inline and next_is_inline:
-                result.append(line.rstrip() + '<br>')
+                result.append(line.rstrip() + '\\')
                 continue
 
         result.append(line)
