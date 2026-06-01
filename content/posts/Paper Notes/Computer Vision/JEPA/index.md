@@ -29,7 +29,8 @@ draft: false
     ⭕ Learn at the embedding level to omit pixel input and generalize 
     ⭕ Adds context encoder & positional encoding to inject context  and force model to pick up image inherent structure from reconstructing multiple masked patches with one target.
     ↓
-    ❌ JEAs wants to cheat: if I always map all pixels to a constant for both the predictor and end target encoder then the reconstruction error is always collapsed to zero! Hehe~ ![alt text](images/JEAs.png)
+    ❌ JEAs wants to cheat: if I always map all pixels to a constant for both the predictor and end target encoder then the reconstruction error is always collapsed to zero! Hehe~ 
+    ![alt text](images/JEAs.png)
     ↓
     ⭕ EMA (Exponential moving avg.): Update target encoder parameters from the EMA of context encoders. This 'delays' the target encoder to prevent collapsing (a trick from the BYOL paper[2020], proven essential to training JEAs with ViT). 
 
