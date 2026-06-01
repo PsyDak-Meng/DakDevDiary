@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: Georgia, serif; max-width: 740px; margin: 40px auto; line-height: 1.7; color: #333; }
+  blockquote { border-left: 3px solid #ccc; margin: 1.5em 0; padding: 0.5em 1em; color: #555; }
+  pre { background: #f4f4f4; padding: 1em; overflow-x: auto; border-radius: 4px; }
+  code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; font-size: 0.9em; }
+  pre code { background: none; padding: 0; }
+  img { max-width: 100%; }
+</style>
+</head>
+<body>
+<h1>Paper Reading Notes: [JEPA]</h1>
+<h1>[Paper Notes] JEPA: Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture<a href="https://arxiv.org/abs/2301.08243">🔗</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> JEPA learns a a generalized semantic representation with less data pairs by <strong>predicting missing information in the embedding space</strong>, which helps it disregard unnecessary noisy from input(pixel)-level details and learns at a <strong>higher abstraction level</strong> with good semantic generalization.</p>
+</blockquote>
+<hr />
+<h2>1. Innovation &amp; Significance</h2>
+<ul>
+<li><strong>The Bottleneck:</strong> </li>
+<li>Image-text data pair labels are hard to find</li>
+<li>Pixel level pre-training paired &amp; data augmentation are strongly biased towards trained data distribution, hard to determine proper generalization and level of abstraction.</li>
+<li>JEA's (Joint Embedding Architecture) collapse probelm: encoder &amp; decoder attempts to cheat by always landing on trivial constant when predicting itself (reconstruction) and gets away with an easy Error=0.</li>
+<li><strong>The Solution:</strong></li>
+</ul>
+<blockquote>
+<p><strong>Chain-of-thought</strong> <br />
+⭕ Mask pre-training to reduce data &amp; generalize<br />
+↓<br />
+❌ Bad/lower semantic representation without semantic target, could be learning noisy local pixel correlation<br />
+↓<br />
+⭕ Learn at the embedding level to omit pixel input and generalize<br />
+⭕ Adds context encoder &amp; positional encoding to inject context  and force model to pick up image inherent structure from reconstructing multiple masked patches with one target.<br />
+↓<br />
+❌ JEAs wants to cheat: if I always map all pixels to a constant for both the predictor and end target encoder then the reconstruction error is always collapsed to zero! Hehe~<br />
+<img alt="alt text" src="https://raw.githubusercontent.com/PsyDak-Meng/DakDevDiary/main/content/posts/Paper%20Notes/Computer%20Vision/JEPA/images/JEAs.png" /><br />
+↓<br />
+⭕ EMA (Exponential moving avg.): Update target encoder parameters from the EMA of context encoders. This 'delays' the target encoder to prevent collapsing (a trick from the BYOL paper[2020], proven essential to training JEAs with ViT).</p>
+</blockquote>
+<h2>2. Model &amp; High-Level Intuitions</h2>
+<h3>2.1 Model Architecture</h3>
+<p><img alt="alt text" src="https://raw.githubusercontent.com/PsyDak-Meng/DakDevDiary/main/content/posts/Paper%20Notes/Computer%20Vision/JEPA/images/JEPA.png" /><br />
+<strong>Input:</strong> randomly samples block masks from original image within certain aspect ratio changes, and apply mask for context image</p>
+<h3>2.1.2 Context</h3>
+<p><strong>Context Encoder:</strong> ViT encodes context image to embedding <code>S_x</code><br />
+<strong>Mask Token</strong>: an [1,D] randomly initialized shared learnable vector <code>M</code>, values are used where it is a masked pactc (colored pacthes in the figure).<br />
+<strong>Positional embedding</strong>: [1,D] sinusoidal embedding <code>PE</code><br />
+<strong>Predictor</strong>: standard ViT, inputs masked token, context embedding and positional embedding for</p>
+<p align="center"><img alt="equation" src="https://latex.codecogs.com/png.latex?%5Cbg_white%20g_%7B%5Cphi%7D%28M%20%2B%20PE%20%2B%20S_x%29%20%3D%20%5Chat%7By%7D"></p>
+
+<h3>2.1.3 Target</h3>
+<p><strong>Target Encoder</strong>: input original image and masked bbox to get corresponding embedding patches as <code>y</code>. </p>
+<h3>2.1.4 Loss &amp; Training</h3>
+<p>The avg. <code>L_2</code> distance between predicted <code>\hat{y}</code> and target <code>y</code>.</p>
+<p align="center"><img alt="equation" src="https://latex.codecogs.com/png.latex?%5Cbg_white%20%5Cmathcal%7BL%7D%20%3D%20%5Cfrac%7B1%7D%7B%7C%5Cmathcal%7BM%7D%7C%7D%20%5Csum_%7B%28i%2Cj%29%20%5Cin%20%5Cmathcal%7BM%7D%7D%20%5Cleft%7C%20g_%7B%5Cphi%7D%28f_%7B%5Ctheta%7D%28x_v%29%2C%5C%20PE_%7Bi%2Cj%7D%29%20-%20f_%7B%5Cxi%7D%28x%29_%7Bi%2Cj%7D%20%5Cright%7C%5E2"></p>
+
+<p>Where:<br />
+<code>f_{\theta}</code> — context encoder (trained), processes visible patches <code>x_v</code></p>
+<p><code>f_{\xi}</code> — target encoder (EMA), processes full image <code>x</code></p>
+<p><code>g_{\phi}</code> — predictor (trained), takes context representations + positional embedding of masked position</p>
+<p><code>\mathcal{M}</code> — set of masked patch positions</p>
+<p><code>PE_{i,j}</code> — positional embedding at masked position <code>(i,j)</code></p>
+<hr>
+<p>Target encoder's EMA (parameters update not in loss by gradient descent, but direct update after each step):</p>
+<p align="center"><img alt="equation" src="https://latex.codecogs.com/png.latex?%5Cbg_white%20%5Cxi_t%20%3D%20%5Calpha%20%5Cxi_%7Bt-1%7D%20%2B%20%281-%5Calpha%29%5Ctheta_%7Bt-1%7D"></p>
+
+<p align="center"><img alt="equation" src="https://latex.codecogs.com/png.latex?%5Cbg_white%20%3D%20%281-%5Calpha%29%5Csum_%7Bk%3D0%7D%5E%7Bt%7D%20%5Calpha%5Ek%20%5Ctheta_%7Bt-k%7D"></p>
+
+<p>The weight of a past context encoder snapshot <code>\theta_{t-k}</code> decays as <code>\alpha^k</code> — exponentially in how many steps ago it was. That's where the name comes from.</p>
+<p>So with <code>\alpha=0.996</code>:</p>
+<p>1 step ago: weight <code>= 0.996^1 = 0.996</code><br />
+100 steps ago: weight <code>= 0.996^{100} \approx 0.67</code><br />
+1000 steps ago: weight <code>= 0.996^{1000} \approx 0.02</code></p>
+<h3>2.2 Intuitions</h3>
+<p>For anyone familiar with the encoder/decoder architecture pre-training, this paper's biggest innovation no doubt goes into it's self-supervision, the way of obtaining semantic information without labels. It jumped outside of 2 boxes:<br />
+* mask reconstruction is 1:1<br />
+* learning semantics needs labels.</p>
+<h3>2.2.1 Discover Image Semantics in the Context vs. Multi-Target Structure</h3>
+<p>It recognized the semantics exist in pixel structure and provide it to the model by multi context-to-target relationship (similar to data augmentation) combined with positional embedding. Essentially saying, given the context, here is what it misses in different locations, now the pixel &amp; location variation of different mask patches in relation to the context image becomes the source of semantic information.</p>
+<h3>2.2.2 Target Encoder as Semantics Filter for Mask Reconstruction</h3>
+<p>While the context-to-target relation provides semantic, it learns low level semantic as it is equivalent to maximizing mutual information between the original and reconstructed image. But pixel data has high entropy from irrelevant details and reconstruction in pixel space never optimize towards compressing information.<br />
+Hence, I-JEPA's target encoder acts as a stochastic bottleneck, discarding unpredictable information from the target. In information theory,</p>
+<p align="center"><img alt="equation" src="https://latex.codecogs.com/png.latex?%5Cbg_white%20%5Cmax%5C%20I%28%5Chat%7Bz%7D%3B%5C%20f_%7B%5Cxi%7D%28x%29%29"></p>
+
+<p>Rather than maximizing <code>I(\hat{z};\ x)</code> directly. Since <code>f_{\xi}(x)</code> already has low-level entropy compressed away, the predictor only needs to capture what's semantically predictable — the mutual information that survives the encoder bottleneck.</p>
+</body>
+</html>

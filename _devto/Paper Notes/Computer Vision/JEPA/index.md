@@ -12,7 +12,7 @@ tags:
 
 # [Paper Notes] JEPA: Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture[🔗](https://arxiv.org/abs/2301.08243)
 
-> **TL;DR:** JEPA learns a a generalized semantic representation with less data pairs by **predicting missing information in the embedding space**, which helps it disregard unnecessary noisy from input(pixel)-level details and learns at a **higher abstraction level** with good semantic generalization.
+> **TL;DR:** I-JEPA learns a a generalized semantic representation with less data pairs by **predicting missing information in the embedding space**, which helps it disregard unnecessary noisy from input(pixel)-level details and learns at a **higher abstraction level** with good semantic generalization.
 
 ---
 
@@ -21,7 +21,7 @@ tags:
 * **The Bottleneck:** 
   * Image-text data pair labels are hard to find
   * Pixel level pre-training paired & data augmentation are strongly biased towards trained data distribution, hard to determine proper generalization and level of abstraction.
-  * JEA's (Joint Embedding Architecture) collapse probelm: encoder & decoder attempts to cheat by always landing on trivial constant when predicting itself (reconstruction) and gets away with an easy Error=0.
+  * JEA's (Joint Embedding Architecture) collapse problem: encoder & decoder attempts to cheat by always landing on trivial constant when predicting itself (reconstruction) and gets away with an easy Error=0.
 * **The Solution:**
 
 > **Chain-of-thought**<br>
