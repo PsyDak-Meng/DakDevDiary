@@ -16,7 +16,7 @@ import yaml
 INPUT_DIR = Path("content/posts")
 OUTPUT_DIR = Path("_devto")
 # PNG is more reliable than SVG on Dev.to (CSP/proxy compatibility)
-CODECOGS_BASE = "https://latex.codecogs.com/png.image?"
+CODECOGS_BASE = "https://latex.codecogs.com/png.latex?%5Cbg_white%20"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/PsyDak-Meng/DakDevDiary/main"
 
 HUGO_ONLY_FIELDS = {"math", "draft", "date"}
@@ -26,7 +26,7 @@ HUGO_ONLY_FIELDS = {"math", "draft", "date"}
 # (4-space indent in list items) still get hard breaks. Use fenced code blocks instead.
 _BLOCK_RE = re.compile(
     r"^(\s{0,3}#{1,6}\s"   # ATX headings
-    r"|\s{0,3}>"            # blockquotes
+    r"|\s*>"                 # blockquotes (any indent, e.g. inside list items)
     r"|\s*[-*+]\s"          # unordered list items
     r"|\s*\d+\.\s"          # ordered list items
     r"|```|~~~"             # fenced code
@@ -51,9 +51,7 @@ def render_frontmatter(fm: dict) -> str:
 
 
 def latex_to_img(latex: str, display: bool = False) -> str:
-    # \bg{white} forces opaque white background — transparent PNG is invisible in dark mode
-    formula = r'\bg{white} ' + latex.strip()
-    encoded = quote(formula)
+    encoded = quote(latex.strip())
     alt = "equation" if display else latex.strip()[:40]
     return f"![{alt}]({CODECOGS_BASE}{encoded})"
 
@@ -85,38 +83,38 @@ def strip_html_wrappers(body: str) -> str:
 
 
 def add_hard_breaks(body: str) -> str:
-    """Add trailing double-space hard line breaks for consecutive inline text lines.
+    """Join consecutive inline text lines with <br> so each renders on its own line.
 
     Dev.to uses CommonMark where a single newline within a paragraph does not produce
-    a <br>. Lines that are clearly inline content (bold labels, emoji, plain text)
-    need '  ' appended so each renders on its own line.
+    a <br>. Consecutive non-block lines are collapsed into one line joined by <br>
+    so Dev.to renders them with visible hard line breaks.
     """
     lines = body.split('\n')
     in_code = False
-    result = []
+    result: list[str] = []
+    run: list[str] = []
 
-    for i, line in enumerate(lines):
+    def flush_run() -> None:
+        if run:
+            result.append('<br>'.join(l.rstrip() for l in run))
+            run.clear()
+
+    for line in lines:
         stripped = line.strip()
 
         if stripped.startswith('```') or stripped.startswith('~~~'):
+            flush_run()
             in_code = not in_code
+            result.append(line)
+            continue
 
-        if not in_code and i < len(lines) - 1:
-            next_line = lines[i + 1]
-            next_stripped = next_line.strip()
-            is_inline = (
-                stripped
-                and not _BLOCK_RE.match(line)
-                and not line.rstrip().endswith('\\')
-            )
-            next_is_inline = next_stripped and not _BLOCK_RE.match(next_line)
+        if not in_code and stripped and not _BLOCK_RE.match(line):
+            run.append(line)
+        else:
+            flush_run()
+            result.append(line)
 
-            if is_inline and next_is_inline:
-                result.append(line.rstrip() + '\\')
-                continue
-
-        result.append(line)
-
+    flush_run()
     return '\n'.join(result)
 
 
