@@ -1,9 +1,10 @@
-{{ $section := . }}
+{{ $section := .section }}
+{{ $depth := .depth }}
 {{ range $section.Sections }}
-<details open>
+<details {{ if lt $depth 2 }}open{{ end }}>
   <summary>{{ .Title }}</summary>
   <div class="tree-children">
-    {{ partial "content-tree.html" . }}
+    {{ partial "content-tree.html" (dict "section" . "depth" (add $depth 1)) }}
   </div>
 </details>
 {{ end }}

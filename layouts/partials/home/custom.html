@@ -51,7 +51,7 @@
   <details open>
     <summary>{{ .Title }}</summary>
     <div class="tree-children">
-      {{ partial "content-tree.html" . }}
+      {{ partial "content-tree.html" (dict "section" . "depth" 1) }}
     </div>
   </details>
   {{ end }}

@@ -4,9 +4,11 @@ date: 2024-01-01
 tags: ["3D-LLM", "Multimodal", "Paper Review"]
 math: true
 draft: true
+published: true
+devto_sync: false
 ---
 
-# [PAPER NOTES] Title: Subtitle Here [{{< icon "link" >}}](https://arxiv.org/abs/XXXX.XXXXX)
+# [PAPER NOTES] Title: Subtitle Here [🔗](https://arxiv.org/abs/XXXX.XXXXX)
 
 > **TL;DR:** [One to two sentences summarizing the core achievement. E.g., This paper introduces a novel approach to X by leveraging Y, achieving state-of-the-art results on Z.]
 
