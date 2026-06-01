@@ -18,7 +18,11 @@ CODECOGS_BASE = "https://latex.codecogs.com/svg.image?"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/PsyDak-Meng/DakDevDiary/main"
 
 
+HUGO_ONLY_FIELDS = {"math", "draft", "date"}
+
+
 def extract_frontmatter(content: str) -> tuple[dict, str]:
+    # TOML frontmatter (+++) is Hugo-only; treat as unparseable → will be skipped
     if not content.startswith("---"):
         return {}, content
     end = content.index("---", 3)
@@ -88,8 +92,14 @@ def process_file(src: Path) -> None:
     content = src.read_text(encoding="utf-8")
     fm, body = extract_frontmatter(content)
 
-    # Skip Hugo section index files and explicitly opted-out files
-    if src.name == "_index.md" or fm.get("draft") is True or fm.get("devto_sync") is False:
+    # Skip section indexes, TOML-frontmatter files (unparseable → empty fm + no title),
+    # drafts, and explicitly opted-out files
+    if (
+        src.name == "_index.md"
+        or not fm.get("title")
+        or fm.get("draft") is True
+        or fm.get("devto_sync") is False
+    ):
         return
 
     rel = src.relative_to(INPUT_DIR)
@@ -100,7 +110,11 @@ def process_file(src: Path) -> None:
     if existing_id is not None:
         fm["id"] = existing_id
 
-    # Sanitize tags: Dev.to requires lowercase, no spaces, max 4
+    # Strip Hugo-specific fields Dev.to doesn't understand
+    for field in HUGO_ONLY_FIELDS:
+        fm.pop(field, None)
+
+    # Sanitize tags: Dev.to requires lowercase alphanumeric only, max 4
     if "tags" in fm:
         fm["tags"] = [re.sub(r"[^a-z0-9]", "", t.lower()) for t in fm["tags"][:4]]
 
