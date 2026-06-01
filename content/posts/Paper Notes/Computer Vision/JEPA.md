@@ -3,7 +3,7 @@ title: "Paper Reading Notes: [JEPA]"
 date: 2026-05-30
 tags: ["Embeddings", "Computer Vision", "Self-Supervised Learning", "Paper Review"]
 math: true
-draft: true
+draft: false
 ---
 
 # [Paper Notes] JEPA: Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture[{{< icon "link" >}}](https://arxiv.org/abs/2301.08243)

@@ -1,6 +1,6 @@
 ---
 title: "Paper Reading Notes: [Short, Catchy Title]"
-date: YYYY-MM-DD
+date: 2024-01-01
 tags: ["3D-LLM", "Multimodal", "Paper Review"]
 math: true
 draft: true
