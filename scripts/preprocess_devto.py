@@ -88,33 +88,65 @@ def add_hard_breaks(body: str) -> str:
     Dev.to uses CommonMark where a single newline within a paragraph does not produce
     a <br>. Consecutive non-block lines are collapsed into one line joined by <br>
     so Dev.to renders them with visible hard line breaks.
+
+    Blockquote lines and their lazy-continuation inline lines are buffered together,
+    dedented to the block level (dev.to ignores indented blockquotes inside list items),
+    and emitted with <br> hard breaks between items so Dev.to renders each line visibly.
     """
     lines = body.split('\n')
     in_code = False
     result: list[str] = []
     run: list[str] = []
+    bq_buf: list[str] = []  # blockquote + lazy-continuation lines, dedented on flush
 
     def flush_run() -> None:
         if run:
             result.append('<br>'.join(l.rstrip() for l in run))
             run.clear()
 
+    def flush_bq() -> None:
+        """Emit buffered blockquote group dedented to block level with <br> hard breaks."""
+        if not bq_buf:
+            return
+        for i, ln in enumerate(bq_buf):
+            suffix = '<br>' if i < len(bq_buf) - 1 else ''
+            result.append(ln.lstrip().rstrip() + suffix)
+        bq_buf.clear()
+
     for line in lines:
         stripped = line.strip()
 
         if stripped.startswith('```') or stripped.startswith('~~~'):
             flush_run()
+            flush_bq()
             in_code = not in_code
             result.append(line)
             continue
 
-        if not in_code and stripped and not _BLOCK_RE.match(line):
-            run.append(line)
+        if in_code:
+            result.append(line)
+            continue
+
+        is_bq = bool(re.match(r'\s*>', line))
+        is_block = bool(_BLOCK_RE.match(line)) and not is_bq
+
+        if stripped and not is_bq and not is_block:
+            if bq_buf:
+                # Lazy continuation: re-prefix with the blockquote marker
+                bq_prefix = re.match(r'(\s*>)', bq_buf[0]).group(1)
+                bq_buf.append(bq_prefix + ' ' + stripped)
+            else:
+                run.append(line)
+        elif is_bq:
+            flush_run()
+            bq_buf.append(line)
         else:
             flush_run()
+            flush_bq()
             result.append(line)
 
     flush_run()
+    flush_bq()
     return '\n'.join(result)
 
 

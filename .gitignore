@@ -4,3 +4,5 @@ resources/_gen/
 
 # Quarto rendered output
 **/index_files/
+
+.env

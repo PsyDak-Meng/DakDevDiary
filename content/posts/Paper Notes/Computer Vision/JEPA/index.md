@@ -92,7 +92,7 @@ For anyone familiar with the encoder/decoder architecture pre-training, this pap
 It recognized the semantics exist in pixel structure and provide it to the model by multi context-to-target relationship (similar to data augmentation) combined with positional embedding. Essentially saying, given the context, here is what it misses in different locations, now the pixel & location variation of different mask patches in relation to the context image becomes the source of semantic information.
 ### 2.2.2 Target Encoder as Semantics Filter for Mask Reconstruction
 While the context-to-target relation provides semantic, it learns low level semantic as it is equivalent to maximizing mutual information between the original and reconstructed image. But pixel data has high entropy from irrelevant details and reconstruction in pixel space never optimize towards compressing information.
-Hence, I-JEPA's target encoder acts as a stochastic bottleneck, discarding unpredictable information from the target. In informatio theory,
+Hence, I-JEPA's target encoder acts as a stochastic bottleneck, discarding unpredictable information from the target. In information theory,
 <div style="text-align: center;">
 $$\max\ I(\hat{z};\ f_{\xi}(x))$$
 </div>
