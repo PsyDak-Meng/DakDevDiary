@@ -88,8 +88,8 @@ def process_file(src: Path) -> None:
     content = src.read_text(encoding="utf-8")
     fm, body = extract_frontmatter(content)
 
-    # Skip Hugo drafts and files explicitly opted out
-    if fm.get("draft") is True or fm.get("devto_sync") is False:
+    # Skip Hugo section index files and explicitly opted-out files
+    if src.name == "_index.md" or fm.get("draft") is True or fm.get("devto_sync") is False:
         return
 
     rel = src.relative_to(INPUT_DIR)

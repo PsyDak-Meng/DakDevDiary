@@ -1,0 +1,26 @@
+{{ define "main" }}
+  {{ .Scratch.Set "scope" "list" }}
+
+  <header>
+    <h1 class="mt-5 text-4xl font-extrabold text-neutral-900 dark:text-neutral">{{ .Title }}</h1>
+  </header>
+
+  {{ $allPosts := where site.RegularPages "Section" "posts" }}
+  {{ $sorted := $allPosts.ByDate.Reverse }}
+
+  {{ if gt (len $sorted) 0 }}
+    <section class="space-y-10 w-full mt-8">
+      {{ range (.Paginate $sorted).Pages }}
+        {{ partial "article-link/simple.html" . }}
+      {{ end }}
+    </section>
+  {{ else }}
+    <section class="mt-10 prose dark:prose-invert">
+      <p class="py-8 border-t">
+        <em>{{ i18n "list.no_articles" | emojify }}</em>
+      </p>
+    </section>
+  {{ end }}
+
+  {{ partial "pagination.html" . }}
+{{ end }}

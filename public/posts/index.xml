@@ -2,24 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Dakota Meng&#39;s technical headaches</title>
-    <link>http://localhost:1313/DakDevDiary/posts/</link>
+    <link>https://psydak-meng.github.io/DakDevDiary/posts/</link>
     <description>Recent content in Posts on Dakota Meng&#39;s technical headaches</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <managingEditor>dakotameng.cm@gmail.com (PsyDak Meng)</managingEditor>
     <webMaster>dakotameng.cm@gmail.com (PsyDak Meng)</webMaster>
     <copyright>© 2026 PsyDak Meng</copyright>
-    <lastBuildDate>Sun, 08 Mar 2026 16:51:46 -0700</lastBuildDate><atom:link href="http://localhost:1313/DakDevDiary/posts/index.xml" rel="self" type="application/rss+xml" />
-    
-    <item>
-      <title>Test_post</title>
-      <link>http://localhost:1313/DakDevDiary/posts/test_post/</link>
-      <pubDate>Sun, 08 Mar 2026 16:51:46 -0700</pubDate>
-      <author>dakotameng.cm@gmail.com (PsyDak Meng)</author>
-      <guid>http://localhost:1313/DakDevDiary/posts/test_post/</guid>
-      <description></description>
-      
-    </item>
+    <lastBuildDate></lastBuildDate><atom:link href="https://psydak-meng.github.io/DakDevDiary/posts/index.xml" rel="self" type="application/rss+xml" />
     
   </channel>
 </rss>

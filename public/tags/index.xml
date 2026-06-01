@@ -2,14 +2,54 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Dakota Meng&#39;s technical headaches</title>
-    <link>http://localhost:1313/DakDevDiary/tags/</link>
+    <link>https://psydak-meng.github.io/DakDevDiary/tags/</link>
     <description>Recent content in Tags on Dakota Meng&#39;s technical headaches</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <managingEditor>dakotameng.cm@gmail.com (PsyDak Meng)</managingEditor>
     <webMaster>dakotameng.cm@gmail.com (PsyDak Meng)</webMaster>
     <copyright>© 2026 PsyDak Meng</copyright>
-    <atom:link href="http://localhost:1313/DakDevDiary/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 30 May 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://psydak-meng.github.io/DakDevDiary/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Computer Vision</title>
+      <link>https://psydak-meng.github.io/DakDevDiary/tags/computer-vision/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <author>dakotameng.cm@gmail.com (PsyDak Meng)</author>
+      <guid>https://psydak-meng.github.io/DakDevDiary/tags/computer-vision/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Embeddings</title>
+      <link>https://psydak-meng.github.io/DakDevDiary/tags/embeddings/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <author>dakotameng.cm@gmail.com (PsyDak Meng)</author>
+      <guid>https://psydak-meng.github.io/DakDevDiary/tags/embeddings/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Paper Review</title>
+      <link>https://psydak-meng.github.io/DakDevDiary/tags/paper-review/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <author>dakotameng.cm@gmail.com (PsyDak Meng)</author>
+      <guid>https://psydak-meng.github.io/DakDevDiary/tags/paper-review/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Self-Supervised Learning</title>
+      <link>https://psydak-meng.github.io/DakDevDiary/tags/self-supervised-learning/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <author>dakotameng.cm@gmail.com (PsyDak Meng)</author>
+      <guid>https://psydak-meng.github.io/DakDevDiary/tags/self-supervised-learning/</guid>
+      <description></description>
+      
+    </item>
     
   </channel>
 </rss>
