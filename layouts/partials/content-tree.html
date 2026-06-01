@@ -1,0 +1,12 @@
+{{ $section := . }}
+{{ range $section.Sections }}
+<details>
+  <summary>{{ .Title }}</summary>
+  <div class="tree-children">
+    {{ partial "content-tree.html" . }}
+  </div>
+</details>
+{{ end }}
+{{ range $section.RegularPages }}
+<div class="tree-leaf"><a href="{{ .Permalink }}">{{ .Title }}</a></div>
+{{ end }}

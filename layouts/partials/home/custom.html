@@ -1,0 +1,31 @@
+<div class="content-tree prose dark:prose-invert max-w-none">
+  <h2>Contents</h2>
+  {{ range .Site.Sections }}
+  <details open>
+    <summary>{{ .Title }}</summary>
+    <div class="tree-children">
+      {{ partial "content-tree.html" . }}
+    </div>
+  </details>
+  {{ end }}
+</div>
+
+<style>
+.content-tree details { margin: 0.25rem 0; }
+.content-tree summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.content-tree summary::before { content: "▶"; font-size: 0.7em; transition: transform 0.15s; }
+.content-tree details[open] > summary::before { transform: rotate(90deg); }
+.content-tree .tree-children { padding-left: 1.5rem; border-left: 1px solid rgba(128,128,128,0.2); margin-left: 0.5rem; }
+.content-tree .tree-leaf { padding: 0.15rem 0.4rem; }
+.content-tree .tree-leaf a { text-decoration: none; }
+.content-tree .tree-leaf a:hover { text-decoration: underline; }
+</style>
