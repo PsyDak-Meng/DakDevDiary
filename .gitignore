@@ -1,3 +1,6 @@
 public/
 resources/_gen/
 .hugo_build.lock
+
+# Quarto rendered output
+**/index_files/
