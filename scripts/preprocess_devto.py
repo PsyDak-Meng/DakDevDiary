@@ -102,7 +102,7 @@ def process_file(src: Path) -> None:
 
     # Sanitize tags: Dev.to requires lowercase, no spaces, max 4
     if "tags" in fm:
-        fm["tags"] = [re.sub(r"\s+", "", t).lower() for t in fm["tags"][:4]]
+        fm["tags"] = [re.sub(r"[^a-z0-9]", "", t.lower()) for t in fm["tags"][:4]]
 
     # Inject published: true here so Hugo never sees it in source files
     fm["published"] = True
