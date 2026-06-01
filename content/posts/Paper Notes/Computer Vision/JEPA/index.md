@@ -10,7 +10,7 @@ draft: false
 
 # [Paper Notes] JEPA: Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture[{{< icon "link" >}}](https://arxiv.org/abs/2301.08243)
 
-> **TL;DR:** JEPA learns a a generalized semantic representation with less data pairs by **predicting missing information in the embedding space**, which helps it disregard unnecessary noisy from input(pixel)-level details and learns at a **higher abstraction level** with good semantic generlization.
+> **TL;DR:** JEPA learns a a generalized semantic representation with less data pairs by **predicting missing information in the embedding space**, which helps it disregard unnecessary noisy from input(pixel)-level details and learns at a **higher abstraction level** with good semantic generalization.
 
 ---
 
@@ -41,7 +41,7 @@ draft: false
 **Context Encoder:** ViT encodes context image to embedding $S_x$
 **Mask Token**: an [1,D] randomly initialized shared learnable vector $M$, values are used where it is a masked pactc (colored pacthes in the figure).
 **Positional embedding**: [1,D] sinusoidal embedding $PE$
-**Predictor**: standard ViT, inputs masked token, contect embedding and positional embedding for
+**Predictor**: standard ViT, inputs masked token, context embedding and positional embedding for
 <div style="text-align: center;">
 $$g_{\phi}(M + PE + S_x) = \hat{y}$$
 </div>
