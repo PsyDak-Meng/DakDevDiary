@@ -110,7 +110,7 @@ def add_hard_breaks(body: str) -> str:
             next_is_inline = next_stripped and not _BLOCK_RE.match(next_line)
 
             if is_inline and next_is_inline:
-                result.append(line.rstrip() + '  ')
+                result.append(line.rstrip() + '<br>')
                 continue
 
         result.append(line)

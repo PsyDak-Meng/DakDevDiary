@@ -36,4 +36,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '_devto/**/*.md'
           branch: main
-          conventional_commits: true
+          conventional_commits: false
