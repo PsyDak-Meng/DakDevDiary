@@ -1,9 +1,10 @@
 """Preprocesses Hugo markdown posts for Dev.to publishing.
 
-Reads content/posts/**/*.md, converts LaTeX → Codecogs SVG images,
-strips Hugo shortcodes, and writes to _devto/ preserving existing id: fields.
+Reads content/posts/**/*.md, converts LaTeX → Codecogs PNG images,
+strips Hugo shortcodes, fixes line breaks and HTML blocks for CommonMark,
+and writes to _devto/ preserving existing id: fields.
 
-Skips files where draft: true or devto_sync: false.
+Skips files where draft: true, devto_sync: false, or no title (e.g. TOML frontmatter).
 """
 import re
 import sys
@@ -14,15 +15,30 @@ import yaml
 
 INPUT_DIR = Path("content/posts")
 OUTPUT_DIR = Path("_devto")
-CODECOGS_BASE = "https://latex.codecogs.com/svg.image?"
+# PNG is more reliable than SVG on Dev.to (CSP/proxy compatibility)
+CODECOGS_BASE = "https://latex.codecogs.com/png.image?"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/PsyDak-Meng/DakDevDiary/main"
-
 
 HUGO_ONLY_FIELDS = {"math", "draft", "date"}
 
+# Lines starting with these are Markdown block elements — don't add hard breaks after them.
+# Note: intentionally excludes \s{4,} (indented code) so list-continuation lines
+# (4-space indent in list items) still get hard breaks. Use fenced code blocks instead.
+_BLOCK_RE = re.compile(
+    r"^(\s{0,3}#{1,6}\s"   # ATX headings
+    r"|\s{0,3}>"            # blockquotes
+    r"|\s*[-*+]\s"          # unordered list items
+    r"|\s*\d+\.\s"          # ordered list items
+    r"|```|~~~"             # fenced code
+    r"|</?[a-zA-Z]"         # HTML tags
+    r"|---+$|===+$"         # thematic breaks / setext underlines
+    r"|\|"                  # tables
+    r")"
+)
+
 
 def extract_frontmatter(content: str) -> tuple[dict, str]:
-    # TOML frontmatter (+++) is Hugo-only; treat as unparseable → will be skipped
+    # TOML frontmatter (+++) is Hugo-only — return empty dict so caller skips the file
     if not content.startswith("---"):
         return {}, content
     end = content.index("---", 3)
@@ -55,6 +71,53 @@ def rewrite_images(body: str, src: Path) -> str:
     return re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', replace, body)
 
 
+def strip_html_wrappers(body: str) -> str:
+    """Remove <div> wrappers that block CommonMark from rendering markdown inside them.
+
+    In CommonMark, a block-level <div> starts an HTML block where markdown is not parsed.
+    Stripping the tags lets image syntax (from LaTeX conversion) render normally.
+    """
+    body = re.sub(r'<div[^>]*>\n?', '', body)
+    body = re.sub(r'\n?</div>', '', body)
+    return body
+
+
+def add_hard_breaks(body: str) -> str:
+    """Add trailing double-space hard line breaks for consecutive inline text lines.
+
+    Dev.to uses CommonMark where a single newline within a paragraph does not produce
+    a <br>. Lines that are clearly inline content (bold labels, emoji, plain text)
+    need '  ' appended so each renders on its own line.
+    """
+    lines = body.split('\n')
+    in_code = False
+    result = []
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        if stripped.startswith('```') or stripped.startswith('~~~'):
+            in_code = not in_code
+
+        if not in_code and i < len(lines) - 1:
+            next_line = lines[i + 1]
+            next_stripped = next_line.strip()
+            is_inline = (
+                stripped
+                and not _BLOCK_RE.match(line)
+                and not line.rstrip().endswith('  ')
+            )
+            next_is_inline = next_stripped and not _BLOCK_RE.match(next_line)
+
+            if is_inline and next_is_inline:
+                result.append(line.rstrip() + '  ')
+                continue
+
+        result.append(line)
+
+    return '\n'.join(result)
+
+
 def preprocess_body(body: str, src: Path) -> str:
     body = rewrite_images(body, src)
     # Hugo link icon shortcode → emoji
@@ -74,6 +137,10 @@ def preprocess_body(body: str, src: Path) -> str:
         lambda m: latex_to_img(m.group(1)),
         body,
     )
+    # Remove <div> wrappers so converted math images render in CommonMark
+    body = strip_html_wrappers(body)
+    # Fix hard line breaks for consecutive inline lines
+    body = add_hard_breaks(body)
     return body
 
 
@@ -92,8 +159,7 @@ def process_file(src: Path) -> None:
     content = src.read_text(encoding="utf-8")
     fm, body = extract_frontmatter(content)
 
-    # Skip section indexes, TOML-frontmatter files (unparseable → empty fm + no title),
-    # drafts, and explicitly opted-out files
+    # Skip section indexes, TOML files (no title after failed parse), drafts, opted-out
     if (
         src.name == "_index.md"
         or not fm.get("title")
@@ -118,7 +184,7 @@ def process_file(src: Path) -> None:
     if "tags" in fm:
         fm["tags"] = [re.sub(r"[^a-z0-9]", "", t.lower()) for t in fm["tags"][:4]]
 
-    # Inject published: true here so Hugo never sees it in source files
+    # Inject published: true so Hugo never sees it in source files
     fm["published"] = True
 
     out_path.write_text(render_frontmatter(fm) + preprocess_body(body, src), encoding="utf-8")
