@@ -1,6 +1,6 @@
 {{ $section := . }}
 {{ range $section.Sections }}
-<details>
+<details open>
   <summary>{{ .Title }}</summary>
   <div class="tree-children">
     {{ partial "content-tree.html" . }}
