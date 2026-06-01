@@ -29,8 +29,7 @@ draft: false
     ⭕ Learn at the embedding level to omit pixel input and generalize 
     ⭕ Adds context encoder & positional encoding to inject context  and force model to pick up image inherent structure from reconstructing multiple masked patches with one target.
     ↓
-    ❌ JEAs wants to cheat: if I always map all pixels to a constant for both the predictor and end target encoder then the reconstruction error is always collapsed to zero! Hehe~
-    ![alt text](images/JEAs.png)
+    ❌ JEAs wants to cheat: if I always map all pixels to a constant for both the predictor and end target encoder then the reconstruction error is always collapsed to zero! Hehe~ ![alt text](images/JEAs.png)
     ↓
     ⭕ EMA (Exponential moving avg.): Update target encoder parameters from the EMA of context encoders. This 'delays' the target encoder to prevent collapsing (a trick from the BYOL paper[2020], proven essential to training JEAs with ViT). 
 
@@ -88,9 +87,9 @@ For anyone familiar with the encoder/decoder architecture pre-training, this pap
 * mask reconstruction is 1:1
 * learning semantics needs labels.
 
-### 2.2.1 Discover Semantics in the image Structure
+### 2.2.1 Discover Image Semantics in the Context vs. Multi-Target Structure
 It recognized the semantics exist in pixel structure and provide it to the model by multi context-to-target relationship (similar to data augmentation) combined with positional embedding. Essentially saying, given the context, here is what it misses in different locations, now the pixel & location variation of different mask patches in relation to the context image becomes the source of semantic information.
-### 2.2.2 Higher level semantic pairs better with mask reconstruction
+### 2.2.2 Target Encoder as Semantics Filter for Mask Reconstruction
 While the context-to-target relation provides semantic, it learns low level semantic as it is equivalent to maximizing mutual information between the original and reconstructed image. But pixel data has high entropy from irrelevant details and reconstruction in pixel space never optimize towards compressing information.
 Hence, I-JEPA's target encoder acts as a stochastic bottleneck, discarding unpredictable information from the target. In informatio theory,
 <div style="text-align: center;">
