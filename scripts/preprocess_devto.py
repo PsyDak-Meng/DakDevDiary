@@ -100,6 +100,9 @@ def process_file(src: Path) -> None:
     if existing_id is not None:
         fm["id"] = existing_id
 
+    # Inject published: true here so Hugo never sees it in source files
+    fm["published"] = True
+
     out_path.write_text(render_frontmatter(fm) + preprocess_body(body, src), encoding="utf-8")
     print(f"  processed: {rel}")
 
